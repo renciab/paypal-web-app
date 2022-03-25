@@ -96,13 +96,13 @@
 	    <repository>
 	      <id>nexus</id>
 	      <name>Landmark Technologies Releases Nexus Repository</name>
-	      <url>http://44.201.165.76:8081/repository/paypal-release/</url>
+	      <url>http://44.201.165.76:8081/repository/kdb1-devrelease/</url>
 	    </repository>
 	    
 	    <snapshotRepository>
 	      <id>nexus</id>
 	      <name>Landmark Technologies Snapshot Nexus Repository </name>
-	      <url>http://44.201.165.76:8081/repository/paypal-snapshot/</url>
+	      <url>http://44.201.165.76:8081/repository/kdb1-devsnap/</url>
 	    </snapshotRepository>
 	    
 	</distributionManagement>
