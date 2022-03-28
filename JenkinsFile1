@@ -26,13 +26,13 @@ pipeline{
 					sh "echo code quality successful and ready to upload"
 				}
 								}
-		 stage('4.UploadArtifact'){
-			steps{
-						sh "echo uploading artifacts to nexus"
-						sh "mvn deploy"	
-						sh "echo package successfully uploaded to nexus"
-			    }
-			    				 }
+		 // stage('4.UploadArtifact'){
+		//	steps{
+					//	sh "echo uploading artifacts to nexus"
+					//	sh "mvn deploy"	
+					//	sh "echo package successfully uploaded to nexus"
+			 //   }
+			    				// }
 		stage('5.Deploy'){
 			steps{
 					sh "echo deploying to tomcat"
