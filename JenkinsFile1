@@ -1,0 +1,78 @@
+pipeline{
+    agent any
+    tools{
+     maven 'Maven 3.8.5'
+    }
+    stages{
+    	stage('1.Clone'){
+			steps{
+					sh "echo cloning the latest version of the code"
+					git credentialsId: 'GIT-CREDENTIALS', url: 'https://github.com/renciab/paypal-web-app'
+					sh "echo cloning successful"
+				}
+						}
+		stage('2.Build'){
+			steps{
+					sh "echo validation, compilation, testing and package"
+					sh "echo testing successful and ready for package"
+					sh "mvn clean package"
+					sh "echo packaging is successful"
+				}
+						}
+		stage('3.CodeQuality'){
+			steps{
+					sh "echo performing code analysis"
+					sh "mvn sonar:sonar"
+					sh "echo code quality successful and ready to upload"
+				}
+								}
+		 stage('4.UploadArtifact'){
+			steps{
+						sh "echo uploading artifacts to nexus"
+						sh "mvn deploy"	
+						sh "echo package successfully uploaded to nexus"
+			    }
+			    				 }
+		stage('5.Deploy'){
+			steps{
+					sh "echo deploying to tomcat"
+						sshagent(['SSHTOMCAT2-CREDENTIAL']) {
+	   					sh "scp -o StrictHostKeyChecking=no  target/*war ec2-user@44.203.135.122:/opt/tomcat9/webapps/devApp.war"
+														}
+				}
+}
+		stage('6.Deploy2UAT'){
+			steps{
+					sh "echo deploying to UAT environment"
+						sshagent(['SSHTOMCAT2-CREDENTIAL']) {
+						sh "scp -o StrictHostKeyChecking=no  target/*war ec2-user@44.203.135.122:/opt/tomcat9/webapps/UATApp.war"
+													}
+				} 
+							}
+    		stage('7.Deploy2PROD'){
+			steps{
+					sh "echo deploying Application to PROD environment"
+						timeout(time:8, unit:'HOURS'){
+						input message: 'Please approve deployment to Production'
+											   }
+						sshagent(['SSHTOMCAT2-CREDENTIAL']) {
+						sh "scp -o StrictHostKeyChecking=no  target/*war ec2-user@44.203.135.122:/opt/tomcat9/webapps/app.war"
+							                                                              }
+				    }	
+							}
+    }
+    post{
+   always {
+	            echo 'Test run completed'
+	            emailext body: 'Please review Build status', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Build Status'
+	                     }
+	        success {
+	            echo 'Successfully!'
+	                       }
+	        failure {
+	echo 'Test run completed'
+	            emailext body: 'Build failed. Please review the error', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Build Status: failed'
+	            echo 'Failed!'
+                     }     
+    }
+}
