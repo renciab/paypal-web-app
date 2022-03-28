@@ -1,0 +1,29 @@
+@Library('Rencia-sharedlibs')  _
+pipeline {
+agent any
+tools {
+		maven 'Maven 3.8.5'
+	      }
+	stages {
+		stage('CheckoutCode') {
+			steps {
+					git 'https://github.com/renciab/paypal-web-app'
+					}
+			}
+		stage("Build") {
+			steps {
+					common("Build") 
+			}
+		}
+			stage("CodeQuality") {
+			steps {
+					common("SonarQube Report")
+			}
+		}
+	//	stage("UploadArtifacts") {
+	//		steps {
+	//				common("Upload Into Nexus")
+	//		}
+	//	}
+	}
+}
